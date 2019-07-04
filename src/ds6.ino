@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <ds6_SSD1306.h>
-//#include <BLEPeripheral.h>
+//#include <bluefruit.h>
 
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
