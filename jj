@@ -1,0 +1,113 @@
+  379  platformio run
+  404  cp /root/.platformio/boards/ds6.json boards/
+  405  cp ~/.platformio/packages/framework-arduinonordicnrf5/variants/ds6/* variants/
+  425  cp -rfp platformio-ds6/ platformio-jj
+  426  cd platformio-ds6/
+  429  mv platformio-ds6/ platformio-ds6-backup
+  430  git clone https://github.com/najnesnaj/platformio-ds6
+  436  mv platformio-ds6-backup/ platformio-ds6
+  437  cd platformio-ds6
+  439  find /root/.platformio/ -name nrf52_xxaa.ld
+  440  cp /root/.platformio/packages/framework-arduinonordicnrf5/cores/arduino-core-nrf52/cores/arduino/components/toolchain/gcc/nrf52_xxaa.ld .
+  450  cd platformio-ds6/
+  459  cd /usr/src/platformio-ds6/
+  473  git clone https://github.com/najnesnaj/platformio-ds6.wiki.git
+  475  cd platformio-ds6.wiki
+  480  cd platformio-ds6
+  491  cd platformio-ds6
+  497  platformio run
+  498  platformio lib search "header:BLEPeripheral.h"
+  499  platformio lib search Bluefruit
+  500  platformio lib search Bluefruit52lib
+  501  platformio platform install platform-nordicnrf52
+  504  platformio platform install platform-nordicnrf52
+  505  platformio platform list
+  506  platformio platform install nordicnrf52
+  508  cd .platformio/
+  513  cp ds6.json /usr/src/platformio-ds6/boards/
+  515  cd /usr/src/platformio-ds6
+  516  platformio lib list adafruit
+  517  platformio lib search adafruit
+  518  platformio lib search bluefruit
+  519  platformio lib search bluefruitle
+  520  platformio lib search bluefruit52
+  522  vi platformio.ini 
+  523  cp platformio.ini platformio.ini-old
+  524  vi platformio.ini
+  525  platformio run
+  526  vi platformio.ini
+  527  platformio run
+  528  vi platformio.ini
+  529  platformio run
+  534  cd .platformio/
+  546  cd .platformio/
+  564  cd /usr/src/platformio-ds6
+  570  platformio run
+  572  cd .platformio/
+  584  cd platformio-ds6
+  585  platformio run
+  588  vi platformio.ini
+  589  platformio run
+  592  cd .platformio/
+  642  cd /usr/src/platformio-ds6
+  643  platformio init
+  646  platformio run
+  648  vi platformio.ini
+  649  vi platformio.ini-old 
+  650  vi platformio.ini
+  651  platformio run
+  653  cd .platformio/
+  672  cd platformio-ds6
+  674  vi platformio.ini
+  675  platformio run
+  676  platformio device list
+  677  platformio platform list
+  679  more platformio.ini
+  681  platformio platform update
+  682  platformio run
+  687  platformio run
+  690  vi platformio.ini
+  691  platformio run
+  693  cd .platformio/
+  722  cd /usr/src/platformio-ds6
+  723  platformio run
+  726  cd .platformio/
+  733  cd /usr/src/platformio-ds6
+  735  vi platformio.ini
+  736  platformio run
+  739  cd .platformio/
+  749  cd platformio-ds6
+  751  vi platformio.ini
+  752  platformio run
+  753  vi platformio.ini
+  754  platformio run
+  756  mkdir platformio-feather
+  757  cd platformio-feather/
+  759  platformio boards feather
+  760  platformio init --board adafruit_feather_nrf52832
+  763  cp ../../platformio-ds6/src/* .
+  765  platformio run
+  766  platformio lib search Adafruit_GFX
+  768  more platformio.ini 
+  769  platformio lib install 13
+  770  platformio run
+  772  cd .platformio/
+  790  cd platformio-feather/
+  791  platformio run
+  796  cd platformio-ds6/src/
+  803  platformio lib search adafruit_GFX
+  806  cd platformio-feather/
+  809  cd platformio-ds6
+  813  cp .piolibdeps/Adafruit SSD1306_ID135/splash.h ../platformio-feather/src/
+  814  cp ".piolibdeps/Adafruit SSD1306_ID135/splash.h" ../platformio-feather/src/
+  815  cd ../platformio-feather/
+  816  platformio run
+  819  cd .platformio/
+  832  cd platformio-feather/
+  833  platformio run
+  836  cd .platformio/
+  857  cd platformio-feather/
+  859  platformio run
+  860  cd ../platformio-ds6
+  862  cd ../platformio-feather/
+  876  history | grep platformio > jj

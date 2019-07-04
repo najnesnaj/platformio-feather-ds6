@@ -1,0 +1,1 @@
+openocd -s /usr/local/share/openocd/scripts  -f interface/raspberrypi2-native.cfg -c "transport select swd" -c "adapter_khz 1000"  -f target/nrf52.cfg 
