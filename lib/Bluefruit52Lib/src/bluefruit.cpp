@@ -100,7 +100,7 @@ void adafruit_soc_task(void* arg);
 static void bluefruit_blinky_cb( TimerHandle_t xTimer )
 {
   (void) xTimer;
-  digitalToggle(LED_BLUE);
+ // digitalToggle(LED_BLUE);
 }
 
 
@@ -635,9 +635,9 @@ uint16_t AdafruitBluefruit::connHandle(void)
   return _conn_hdl;
 }
 
-bool AdafruitBluefruit::connPaired(void)
+bool AdafruitBluefruit::connPaired(uint16_t conn_hdl)
 {
-  BLEConnection* conn = Bluefruit.Connection(_conn_hdl);
+  BLEConnection* conn = Bluefruit.Connection(conn_hdl);
   return conn && conn->paired();
 }
 
@@ -826,16 +826,7 @@ void AdafruitBluefruit::_ble_handler(ble_evt_t* evt)
       LOG_LV2("GAP", "Disconnect Reason 0x%02X", evt->evt.gap_evt.params.disconnected.reason);
 
       // Turn off Conn LED If not connected at all
-      bool still_connected = false;
-      for (uint8_t i=0; i<BLE_MAX_CONNECTION; i++)
-      {
-        if ( _connection[i] && _connection[i]->connected() )
-        {
-          still_connected = true;
-          break;
-        }
-      }
-      if ( !still_connected ) _setConnLed(false);
+      if ( !this->connected() ) _setConnLed(false);
 
       // Invoke disconnect callback
       if ( conn->getRole() == BLE_GAP_ROLE_PERIPH )
@@ -848,7 +839,6 @@ void AdafruitBluefruit::_ble_handler(ble_evt_t* evt)
 
       delete _connection[conn_hdl];
       _connection[conn_hdl] = NULL;
-
     }
     break;
 
@@ -994,13 +984,15 @@ void AdafruitBluefruit::_startConnLed(void)
 void AdafruitBluefruit::_stopConnLed(void)
 {
   xTimerStop(_led_blink_th, 0);
+
+  _setConnLed( this->connected() );
 }
 
 void AdafruitBluefruit::_setConnLed (bool on_off)
 {
   if (_led_conn)
   {
-    digitalWrite(LED_BLUE, on_off ? LED_STATE_ON : (1-LED_STATE_ON) );
+   // digitalWrite(LED_BLUE, on_off ? LED_STATE_ON : (1-LED_STATE_ON) );
   }
 }
 

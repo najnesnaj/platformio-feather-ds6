@@ -1,0 +1,1 @@
+adafruit-nrfutil dfu genpkg --application-version 0xffffffff --dev-type 0x0052 --sd-req 0x00A8   --application sketch_jul13a.ino.feather_nrf52832.hex D6-DS.zip

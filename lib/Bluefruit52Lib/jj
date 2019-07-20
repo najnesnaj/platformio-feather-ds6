@@ -1,0 +1,10 @@
+./examples/Central/central_bleuart_multi/central_bleuart_multi.ino: * LED_BLUE  - Blinks constantly when scanning
+./examples/Hardware/hwpwm/hwpwm.ino:  HwPWM1.addPin( LED_BLUE );
+./examples/Hardware/hwpwm/hwpwm.ino:    HwPWM1.writePin(LED_BLUE, fadeValue, true);
+./examples/Hardware/hwpwm/hwpwm.ino:    HwPWM1.writePin(LED_BLUE, fadeValue, true);
+./examples/Hardware/rtos_scheduler/rtos_scheduler.ino: * - loop2() toggle LED_BLUE every half of second
+./examples/Hardware/rtos_scheduler/rtos_scheduler.ino:  // LED_RED & LED_BLUE pin already initialized as an output.
+./examples/Hardware/rtos_scheduler/rtos_scheduler.ino:  digitalToggle(LED_BLUE); // Toggle LED 
+./src/bluefruit.cpp:  digitalToggle(LED_BLUE);
+./src/bluefruit.cpp:    digitalWrite(LED_BLUE, on_off ? LED_STATE_ON : (1-LED_STATE_ON) );
+./keywords.txt:LED_BLUE	LITERAL1

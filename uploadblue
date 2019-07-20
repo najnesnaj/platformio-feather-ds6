@@ -1,0 +1,4 @@
+#./upload_blue_legacy.py -f application.hex -d application.dat -a  D8:4D:17:EE:30:5F --legacy
+#./upload_blue_legacy.py -f firmware_app.hex -d firmware_app.dat -a  C6:78:40:29:EC:32  --legacy
+./dfu.py -z dfu-package.zip  -a  C6:78:40:29:EC:32  --legacy
+#./upload_blue_legacy.py -f application.hex -d application.dat -a   F0:27:BE:6A:11:78 --legacy

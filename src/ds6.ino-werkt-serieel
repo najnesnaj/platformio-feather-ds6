@@ -1,0 +1,56 @@
+
+//#include <SPI.h>
+//#include <Wire.h>
+//#include <Adafruit_GFX.h>
+//#include <ds6_SSD1306.h>
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 32
+#define BOOTLOADER_DFU_START 0xB1
+//Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, PIN_SPI_MOSI, PIN_SPI_SCK, OLED_DC, OLED_RST, OLED_CS);
+int i;
+
+/* HRM Service Definitions
+ * Heart Rate Monitor Service:  0x180D
+ * Heart Rate Measurement Char: 0x2A37
+ * Body Sensor Location Char:   0x2A38
+ */
+
+
+
+
+
+void setup()
+{
+	//	pinMode(PIN_VIBRATE, OUTPUT);
+//		pinMode(21, OUTPUT);
+//		digitalWrite(21, 1);
+
+NRF_POWER->GPREGRET = BOOTLOADER_DFU_START;
+Serial.begin(38400); //to comply with the standard settings DFU
+	Serial.println(__FILE__);
+
+
+
+}
+
+void loop()
+{
+	Serial.println("adafruit test");
+	//	digitalWrite(PIN_VIBRATE, 1);
+	delay(20);
+	//	digitalWrite(PIN_VIBRATE, 0);
+	delay(20);
+
+
+
+}
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,7 @@
+pio run
+cp .pioenvs/adafruit_feather_nrf52832/firmware.hex . 
+#./hex2bin.py -r0x26000: .pioenvs/adafruit_feather_nrf52832/firmware.hex firmware.bin
+#./bin2hex.py --offset=0x26000 firmware.bin firmware_app.hex
+#python merge_hex.py dsd6_nrf52832_bootloader-0.2.11-3.hex firmware_app.hex test.hex
+#adafruit-nrfutil dfu genpkg --application-version 0xffffffff --dev-type 0xffff --sd-req 0x00A8 --application firmware_app.hex D6-DS.zip
+adafruit-nrfutil dfu genpkg --dev-type 0x0052 --application firmware.hex dfu-package.zip
