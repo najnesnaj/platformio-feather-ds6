@@ -26,17 +26,23 @@ this is work in progress, but it generates a usable firmware which you can flash
 
 
 --------usefull scripts------
+
 startdebugger (starts openocd back-end, to which you can connect with telnet 127.0.0.1 4444)
 genimage (compiles and creates uploadable image)
 uploadblue (upload firmware via bluetooth)
 upload-serial (upload firmware via serial port)
+
 -----------
+
 the adafruit boatloader was modified by fanoush
-Adafruit_nRF52_Bootloader-dsd6.diff
+Adafruit_nRF52_Bootloader-dsd6.diff -- use patch -p1
 it is adapted to the watch, which does not have the buttons and led the featherboard has
+
 ----------------------------
+
 IMPORTANT: 
 when performing a reset in openocd, make it a double
+
 ----------------------------
 
 

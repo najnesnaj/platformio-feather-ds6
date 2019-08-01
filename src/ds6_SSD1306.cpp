@@ -599,6 +599,7 @@ boolean Adafruit_SSD1306::begin(uint8_t vcs, uint8_t addr, boolean reset,
             commands as needed by one's own application.
 */
 void Adafruit_SSD1306::drawPixel(int16_t x, int16_t y, uint16_t color) {
+	y=HEIGHT - 1 - y;
   if((x >= 0) && (x < width()) && (y >= 0) && (y < height())) {
     // Pixel is in-bounds. Rotate coordinates if needed.
     switch(getRotation()) {

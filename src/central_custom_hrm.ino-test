@@ -34,7 +34,7 @@ BLEClientCharacteristic bslc(UUID16_CHR_BODY_SENSOR_LOCATION);
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(38400);
   while ( !Serial ) delay(10);   // for nrf52840 with native usb
 
   Serial.println("Bluefruit52 Central Custom HRM Example");
@@ -43,13 +43,12 @@ void setup()
   // Initialize Bluefruit with maximum connections as Peripheral = 0, Central = 1
   // SRAM usage required by SoftDevice will increase dramatically with number of connections
   Bluefruit.begin(0, 1);
-  Serial.println("----na begin----------------------------------\n");
 
   Bluefruit.setName("Bluefruit52 Central");
 
   // Initialize HRM client
   hrms.begin();
-  Serial.println("----na hrms----------------------------------\n");
+  Serial.println("---------hrms.begin-------------------\n");
 
   // Initialize client characteristics of HRM.
   // Note: Client Char will be added to the last service that is begin()ed.
@@ -60,11 +59,14 @@ void setup()
   hrmc.begin();
 
   // Increase Blink rate to different from PrPh advertising mode
-  Bluefruit.setConnLedInterval(250);
+//  Bluefruit.setConnLedInterval(250);
+  Serial.println("---------callbacks-------------------\n");
 
   // Callbacks for Central
   Bluefruit.Central.setDisconnectCallback(disconnect_callback);
+  Serial.println("---------disconnect-------------------\n");
   Bluefruit.Central.setConnectCallback(connect_callback);
+  Serial.println("---------connect-------------------\n");
 
   /* Start Central Scanning
    * - Enable auto scan if disconnected
@@ -76,7 +78,8 @@ void setup()
   Bluefruit.Scanner.setRxCallback(scan_callback);
   Bluefruit.Scanner.restartOnDisconnect(true);
   Bluefruit.Scanner.setInterval(160, 80); // in unit of 0.625 ms
-  Bluefruit.Scanner.filterUuid(hrms.uuid);
+  //Bluefruit.Scanner.filterUuid(hrms.uuid);
+  Bluefruit.Scanner.filterUuid(0x2A37); //jj
   Bluefruit.Scanner.useActiveScan(false);
   Bluefruit.Scanner.start(0);                   // // 0 = Don't stop scanning after n seconds
 }
@@ -84,6 +87,7 @@ void setup()
 void loop()
 {
   // do nothing
+ // Serial.println("---------loopin-------------------\n");
 }
 
 /**

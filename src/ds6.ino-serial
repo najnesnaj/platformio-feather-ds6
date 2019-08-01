@@ -23,8 +23,8 @@ int i;
 void setup()
 {
 	//	pinMode(PIN_VIBRATE, OUTPUT);
-//		pinMode(21, OUTPUT);
-//		digitalWrite(21, 1);
+	//		pinMode(21, OUTPUT);
+	//		digitalWrite(21, 1);
 	Serial.begin(38400); //to comply with the standard settings DFU
 	Serial.println(__FILE__);
 
@@ -38,7 +38,7 @@ void setup()
 
 	Serial.println("Initialise the Bluefruit nRF52 module");
 
-//	Bluefruit.begin();
+	//	Bluefruit.begin();
 
 
 
@@ -46,15 +46,15 @@ void setup()
 
 	Serial.println("Setting Device Name to 'Feather52 HRM'");
 
-//	Bluefruit.setName("Bluefruit52 HRM");
+	//	Bluefruit.setName("Bluefruit52 HRM");
 
 
 
 	// Set the connect/disconnect callback handlers
 
-//	Bluefruit.Periph.setConnectCallback(connect_callback);
+	//	Bluefruit.Periph.setConnectCallback(connect_callback);
 
-//	Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
+	//	Bluefruit.Periph.setDisconnectCallback(disconnect_callback);
 
 
 
@@ -62,11 +62,11 @@ void setup()
 
 	Serial.println("Configuring the Device Information Service");
 
-//	bledis.setManufacturer("Adafruit Industries");
+	//	bledis.setManufacturer("Adafruit Industries");
 
-//	bledis.setModel("Bluefruit Feather52");
+	//	bledis.setModel("Bluefruit Feather52");
 
-//	bledis.begin();
+	//	bledis.begin();
 
 
 
@@ -74,9 +74,9 @@ void setup()
 
 	Serial.println("Configuring the Battery Service");
 
-//	blebas.begin();
+	//	blebas.begin();
 
-//	blebas.write(100);
+	//	blebas.write(100);
 
 
 
@@ -94,7 +94,7 @@ void setup()
 
 	Serial.println("Setting up the advertising payload(s)");
 
-//	startAdv();
+	//	startAdv();
 
 }
 
@@ -109,7 +109,7 @@ void loop()
 	if (Serial.available() > 0) {
 		// read the incoming byte:
 		Serial.println("incoming byte");
-
+		enterSerialDfu();
 	}
 	display.clearDisplay();
 	for (i=1; i<30; i++)

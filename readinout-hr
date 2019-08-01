@@ -1,0 +1,58 @@
+connect dev_C6_78_40_29_EC_31
+
+menu gatt
+
+list-attributes
+
+Characteristic
+        /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+	        00002a37-0000-1000-8000-00805f9b34fb
+		        Heart Rate Measurement
+
+			select-attribute /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+
+			of select-attribute 00002a37-0000-1000-8000-00805f9b34fb
+			 
+			 read
+
+
+			 Attempting to read /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+			 [CHG] Attribute /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e Value:
+			   06 7d                                            .}
+			     06 7d                                            .}
+
+
+
+
+
+
+
+
+
+
+
+
+
+connect dev_C6_78_40_29_EC_31
+
+menu gatt
+
+list-attributes
+
+Characteristic
+        /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+	        00002a37-0000-1000-8000-00805f9b34fb
+		        Heart Rate Measurement
+
+			select-attribute /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+
+			of select-attribute 00002a37-0000-1000-8000-00805f9b34fb
+			 
+			 read
+
+
+			 Attempting to read /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e
+			 [CHG] Attribute /org/bluez/hci0/dev_C6_78_40_29_EC_31/service001d/char001e Value:
+			   06 7d                                            .}
+			     06 7d                                            .}
+

@@ -92,6 +92,7 @@ void startAdv(void)
    * For recommended advertising interval
    * https://developer.apple.com/library/content/qa/qa1931/_index.html   
    */
+
   Bluefruit.Advertising.restartOnDisconnect(true);
   Bluefruit.Advertising.setInterval(32, 244);    // in unit of 0.625 ms
   Bluefruit.Advertising.setFastTimeout(30);      // number of seconds in fast mode
@@ -206,7 +207,7 @@ void cccd_callback(uint16_t conn_hdl, BLECharacteristic* chr, uint16_t cccd_valu
 
 void loop()
 {
- // digitalToggle(LED_RED);
+//  digitalToggle(LED_RED);
   
   if ( Bluefruit.connected() ) {
     uint8_t hrmdata[2] = { 0b00000110, bps++ };           // Sensor connected, increment BPS value

@@ -1,0 +1,2 @@
+openocd -s /usr/local/share/openocd/scripts -f interface/stlink.cfg -f target/nrf52.cfg -c "program firmware.hex " -c reset -c exit
+
