@@ -1,0 +1,40 @@
+{
+    "authors": [
+        {
+            "email": null, 
+            "url": "https://os.mbed.com/users/p3p/", 
+            "maintainer": false, 
+            "name": "Chris Pepper"
+        }
+    ], 
+    "description": "First release of a Software I2C implementation, Tested and confirmed to work with the BMP085 Barometric Pressure Sensor", 
+    "examples": [
+        "https://os.mbed.com/users/p3p/code/SoftwareI2C_Test/"
+    ], 
+    "frameworks": [
+        "mbed"
+    ], 
+    "keywords": [
+        "i2c", 
+        "software"
+    ], 
+    "name": "SoftwareI2C", 
+    "platforms": [
+        "atmelsam", 
+        "freescalekinetis", 
+        "maxim32", 
+        "nordicnrf51", 
+        "nordicnrf52", 
+        "nxplpc", 
+        "siliconlabsefm32", 
+        "ststm32", 
+        "teensy", 
+        "wiznet7500"
+    ], 
+    "repository": {
+        "type": "hg", 
+        "url": "https://os.mbed.com/users/p3p/code/SoftwareI2C/"
+    }, 
+    "version": "8670e78c4b", 
+    "id": 2726
+}

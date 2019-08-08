@@ -1,0 +1,50 @@
+{
+    "name": "AsyncDelay", 
+    "version": "1.1.0", 
+    "keywords": [
+        "timing"
+    ], 
+    "description": "Simple abstraction library implementing delays and timeouts.", 
+    "frameworks": [
+        "arduino"
+    ], 
+    "platforms": [
+        "atmelavr", 
+        "atmelsam", 
+        "espressif32", 
+        "espressif8266", 
+        "intel_arc32", 
+        "microchippic32", 
+        "nordicnrf51", 
+        "nordicnrf52", 
+        "ststm32", 
+        "ststm8", 
+        "teensy", 
+        "timsp430"
+    ], 
+    "authors": [
+        {
+            "email": "stevemarple@googlemail.com", 
+            "url": null, 
+            "maintainer": true, 
+            "name": "Steve Marple"
+        }
+    ], 
+    "repository": {
+        "type": "git", 
+        "url": "https://github.com/stevemarple/AsyncDelay"
+    }, 
+    "homepage": null, 
+    "export": {
+        "include": null, 
+        "exclude": [
+            "extras", 
+            "docs", 
+            "tests", 
+            "test", 
+            "*.doxyfile", 
+            "*.pdf"
+        ]
+    }, 
+    "id": 826
+}
