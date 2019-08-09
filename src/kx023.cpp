@@ -1,20 +1,11 @@
 #include "kx023.h"
 
 // flag bits sent to the receiver
-#define MODE_CHANGE 0x80    // a pin mode was changed
-#define DIG_CHANGE  0x40    // a digital output was changed
-#define PWM_CHANGE  0x30    // an analog (pwm) value was changed on port 2..3
-#define ANA_MASK    0x0F    // an analog read was requested on port 1..4
-
-
 void PulsePlug::initPulsePlug(){
-	PulsePlug::setReg(0x18, 0x40);
-	PulsePlug::setReg(0x1B, 0x02);
-	PulsePlug::setReg(0x18, 0xC0);
+	PulsePlug::setReg(regAddressCNTL1 , 0x40);
+	PulsePlug::setReg(regAddressODCNTL, 0x02);
+	PulsePlug::setReg(regAddressCNTL1 , 0xC0);
 
-//	pulse.setReg(0x18, 0x40);
-//	pulse.setReg(0x1B, 0x02);
-//	pulse.setReg(0x18, 0xC0);
 //	Serial.print("setting up LPF");
 
 	//setup LPF--------------------------------------------------
@@ -58,6 +49,63 @@ void PulsePlug::initPulsePlug(){
 }
 
 
+
+void PulsePlug::initPulsePlugTap(){
+	PulsePlug::setReg(regAddressCNTL1 , 0x44);
+	PulsePlug::setReg(regAddressODCNTL, 0x3F);
+	PulsePlug::setReg(regAddressCNTL1 , 0x98);
+	PulsePlug::setReg(regAddressTDTRC , 0x03);
+	PulsePlug::setReg(regAddressTDTC , 0x78); //0.3 sec min between first and second tap 
+	PulsePlug::setReg(regAddressTTH , 0xCB); // tap threshold
+	PulsePlug::setReg(regAddressTTL , 0x1A); // any tap event 
+	PulsePlug::setReg(regAddressFTD , 0xA2); // double tap event 
+	PulsePlug::setReg(regAddressSTD , 0x24); //  
+	PulsePlug::setReg(regAddressTLT , 0x28); //  
+	PulsePlug::setReg(regAddressTWS , 0xA0); //  
+	PulsePlug::setReg(regAddressINC1 , 0x30); //  
+	PulsePlug::setReg(regAddressINC4 , 0x04); //  
+	PulsePlug::setReg(regAddressCNTL1 , 0xC4);
+//	Serial.print("setting up LPF");
+
+	//setup LPF--------------------------------------------------
+
+	//set device standbyMode
+	//readCNTL1reg
+	byte CNTL1 = 0;
+	//CNTL1=pulse.getReg(regAddressCNTL1);
+	CNTL1=PulsePlug::getReg(regAddressCNTL1);
+//	Serial.print("CNTL1 ");
+//	Serial.println(CNTL1);
+	//setCNTL1reg
+
+	CNTL1 = CNTL1 & 0b01111111;
+	//pulse.setReg(regAddressCNTL1,  CNTL1);
+	PulsePlug::setReg(regAddressCNTL1,  CNTL1);
+//	Serial.print("setting up LPF parameters");
+	//set LPF parameters
+	//readODCNTLreg
+	byte ODCNTL = 0;
+	ODCNTL=PulsePlug::getReg(regAddressODCNTL);
+//	Serial.print("ODCNTL ");
+//	Serial.println(ODCNTL );
+	//setODCNTLreg
+	ODCNTL = ODCNTL | 0b01000000;//set filter corner frequency set to ODR/2
+	ODCNTL = ODCNTL & 0b11110000;//set OutputDataRate 12.5Hz
+	PulsePlug::setReg(regAddressODCNTL, ODCNTL);
+
+//	Serial.print("setting up device operating mode");
+	//set device operating mode
+	//readCNTL1reg
+	CNTL1=PulsePlug::getReg(regAddressCNTL1);
+//	Serial.print("CNTL1 ");
+//	Serial.println(CNTL1);
+	//setCNTL1re""g
+	CNTL1 = CNTL1 | 0b10000000;
+	PulsePlug::setReg(regAddressCNTL1, CNTL1);
+	//--------------------------------------------------setup LPF
+
+
+}
 
 int16_t PulsePlug::getCoor (byte reg) {
 	// get a register

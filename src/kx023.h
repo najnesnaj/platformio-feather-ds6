@@ -14,6 +14,16 @@ const int regAddressYOUTL = 0x08;
 const int regAddressZOUTL = 0x0A;
 const int regAddressODCNTL = 0x1B;
 const int regAddressCNTL1 = 0x18;
+const int regAddressTDTRC = 0x24;
+const int regAddressTDTC = 0x25;
+const int regAddressTTH = 0x26;
+const int regAddressTTL = 0x27;
+const int regAddressFTD = 0x28;
+const int regAddressSTD = 0x29;
+const int regAddressTLT = 0x2A;
+const int regAddressTWS = 0x2B;
+const int regAddressINC1 = 0x1C;
+const int regAddressINC4 = 0x1F;
 
 
 
@@ -199,6 +209,7 @@ public:
     byte getReg (byte reg);
     int16_t getCoor (byte reg);
     void initPulsePlug();
+    void initPulsePlugTap();
     void setReg (byte reg, byte val);
     byte readParam (byte addr);
     void writeParam (byte addr, byte val);
