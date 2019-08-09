@@ -8,6 +8,15 @@
 #include <stdint.h>
 #include <avr/pgmspace.h>
 
+const int sendorDeviceAddress = 0x1F;//I2C7bitAddressMode
+const int regAddressXOUTL = 0x06;
+const int regAddressYOUTL = 0x08;
+const int regAddressZOUTL = 0x0A;
+const int regAddressODCNTL = 0x1B;
+const int regAddressCNTL1 = 0x18;
+
+
+
 
 class Port {
 protected:
@@ -189,6 +198,7 @@ public:
 
     byte getReg (byte reg);
     int16_t getCoor (byte reg);
+    void initPulsePlug();
     void setReg (byte reg, byte val);
     byte readParam (byte addr);
     void writeParam (byte addr, byte val);

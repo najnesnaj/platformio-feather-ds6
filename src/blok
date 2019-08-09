@@ -1,0 +1,39 @@
+	pulse.setReg(0x18, 0x40);
+	pulse.setReg(0x1B, 0x02);
+	pulse.setReg(0x18, 0xC0);
+	Serial.print("setting up LPF");
+
+	//setup LPF--------------------------------------------------
+
+	//set device standbyMode
+	//readCNTL1reg
+	byte CNTL1 = 0;
+	CNTL1=pulse.getReg(regAddressCNTL1);
+	Serial.print("CNTL1 ");
+	Serial.println(CNTL1);
+	//setCNTL1reg
+
+	CNTL1 = CNTL1 & 0b01111111;
+	pulse.setReg(regAddressCNTL1,  CNTL1);
+	Serial.print("setting up LPF parameters");
+	//set LPF parameters
+	//readODCNTLreg
+	byte ODCNTL = 0;
+	ODCNTL=pulse.getReg(regAddressODCNTL);
+	Serial.print("ODCNTL ");
+	Serial.println(ODCNTL );
+	//setODCNTLreg
+	ODCNTL = ODCNTL | 0b01000000;//set filter corner frequency set to ODR/2
+	ODCNTL = ODCNTL & 0b11110000;//set OutputDataRate 12.5Hz
+	pulse.setReg(regAddressODCNTL, ODCNTL);
+
+	Serial.print("setting up device operating mode");
+	//set device operating mode
+	//readCNTL1reg
+	CNTL1=pulse.getReg(regAddressCNTL1);
+	Serial.print("CNTL1 ");
+	Serial.println(CNTL1);
+	//setCNTL1re""g
+	CNTL1 = CNTL1 | 0b10000000;
+	pulse.setReg(regAddressCNTL1, CNTL1);
+	//--------------------------------------------------setup LPF

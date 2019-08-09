@@ -6,13 +6,66 @@
 #define PWM_CHANGE  0x30    // an analog (pwm) value was changed on port 2..3
 #define ANA_MASK    0x0F    // an analog read was requested on port 1..4
 
+
+void PulsePlug::initPulsePlug(){
+	PulsePlug::setReg(0x18, 0x40);
+	PulsePlug::setReg(0x1B, 0x02);
+	PulsePlug::setReg(0x18, 0xC0);
+
+//	pulse.setReg(0x18, 0x40);
+//	pulse.setReg(0x1B, 0x02);
+//	pulse.setReg(0x18, 0xC0);
+//	Serial.print("setting up LPF");
+
+	//setup LPF--------------------------------------------------
+
+	//set device standbyMode
+	//readCNTL1reg
+	byte CNTL1 = 0;
+	//CNTL1=pulse.getReg(regAddressCNTL1);
+	CNTL1=PulsePlug::getReg(regAddressCNTL1);
+//	Serial.print("CNTL1 ");
+//	Serial.println(CNTL1);
+	//setCNTL1reg
+
+	CNTL1 = CNTL1 & 0b01111111;
+	//pulse.setReg(regAddressCNTL1,  CNTL1);
+	PulsePlug::setReg(regAddressCNTL1,  CNTL1);
+//	Serial.print("setting up LPF parameters");
+	//set LPF parameters
+	//readODCNTLreg
+	byte ODCNTL = 0;
+	ODCNTL=PulsePlug::getReg(regAddressODCNTL);
+//	Serial.print("ODCNTL ");
+//	Serial.println(ODCNTL );
+	//setODCNTLreg
+	ODCNTL = ODCNTL | 0b01000000;//set filter corner frequency set to ODR/2
+	ODCNTL = ODCNTL & 0b11110000;//set OutputDataRate 12.5Hz
+	PulsePlug::setReg(regAddressODCNTL, ODCNTL);
+
+//	Serial.print("setting up device operating mode");
+	//set device operating mode
+	//readCNTL1reg
+	CNTL1=PulsePlug::getReg(regAddressCNTL1);
+//	Serial.print("CNTL1 ");
+//	Serial.println(CNTL1);
+	//setCNTL1re""g
+	CNTL1 = CNTL1 | 0b10000000;
+	PulsePlug::setReg(regAddressCNTL1, CNTL1);
+	//--------------------------------------------------setup LPF
+
+
+}
+
+
+
 int16_t PulsePlug::getCoor (byte reg) {
 	// get a register
 	union data {
 		int16_t data16;
 		byte  byteStr[2];//{*DATAL,*DATAH}
 	};
-        union data cdata;
+	union data cdata;
 	send();    
 	write(reg);
 	receive();
@@ -35,6 +88,7 @@ byte PulsePlug::getReg (byte reg) {
 	delay(10);
 	return result;
 }
+
 
 void PulsePlug::setReg (byte reg, byte val) {
 	// set a register

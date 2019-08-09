@@ -1,0 +1,430 @@
+#include <SPI.h>
+#include <stdint.h>
+#include <BLEPeripheral.h>
+#include <Adafruit_GFX.h>
+#include <nrf_nvic.h>//interrupt controller stuff
+#include <nrf_sdm.h>
+#include <nrf_soc.h>
+#include <WInterrupts.h>
+#include <Adafruit_SSD1306.h>
+#include <TimeLib.h>
+#include <nrf.h>
+
+#define wdt_reset() NRF_WDT->RR[0] = WDT_RR_RR_Reload
+#define wdt_enable(timeout) \
+  NRF_WDT->CONFIG = NRF_WDT->CONFIG = (WDT_CONFIG_HALT_Pause << WDT_CONFIG_HALT_Pos) | ( WDT_CONFIG_SLEEP_Pause << WDT_CONFIG_SLEEP_Pos); \
+  NRF_WDT->CRV = (32768*timeout)/1000; \
+  NRF_WDT->RREN |= WDT_RREN_RR0_Msk;  \
+  NRF_WDT->TASKS_START = 1
+
+Adafruit_SSD1306 display(128, 32, &SPI, 28, 4, 29);
+
+boolean debug = false;
+
+#define sleepDelay 10000
+#define BUTTON_PIN              30
+#define refreshRate 100
+
+int menu;
+volatile bool buttonPressed = false;
+long startbutton;
+unsigned long sleepTime, displayRefreshTime;
+volatile bool sleeping = false;
+int timezone;
+int steps;
+int steps1;
+String serialNr = "235246472";
+String versionNr = "110.200.051";
+String btversionNr = "100.016.051";
+String msgText;
+
+String bleSymbol = " ";
+int contrast;
+
+BLEPeripheral                   blePeripheral           = BLEPeripheral();
+BLEService                      batteryLevelService     = BLEService("190A");
+BLECharacteristic   TXchar        = BLECharacteristic("0002", BLENotify, 20);
+BLECharacteristic   RXchar        = BLECharacteristic("0001", BLEWriteWithoutResponse, 20);
+
+BLEService                      batteryLevelService1     = BLEService("190B");
+BLECharacteristic   TXchar1        = BLECharacteristic("0004", BLENotify, 20);
+BLECharacteristic   RXchar1        = BLECharacteristic("0003", BLEWriteWithoutResponse, 20);
+
+void powerUp() {
+  if (sleeping) {
+    sleeping = false;
+    display.begin(SSD1306_SWITCHCAPVCC);
+    display.clearDisplay();
+    display.display();
+    if (debug)Serial.begin(115200);
+
+    delay(5);
+  }
+  sleepTime = millis();
+}
+
+void powerDown() {
+  if (!sleeping) {
+    menu = 0;
+    if (debug)NRF_UART0->ENABLE = UART_ENABLE_ENABLE_Disabled;
+    sleeping = true;
+
+    digitalWrite(28, LOW);
+    digitalWrite(5, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(29, LOW);
+    digitalWrite(4, LOW);
+    NRF_SAADC ->ENABLE = 0; //disable ADC
+    NRF_PWM0  ->ENABLE = 0; //disable all pwm instance
+    NRF_PWM1  ->ENABLE = 0;
+    NRF_PWM2  ->ENABLE = 0;
+  }
+}
+
+void charge() {
+  powerUp();
+}
+
+void buttonHandler() {
+  if (!sleeping) buttonPressed = true;
+  powerUp();
+}
+
+void blePeripheralConnectHandler(BLECentral& central) {
+  if (debug)Serial.println("BLEconnected");
+  powerUp();
+  bleSymbol = "B";
+}
+
+void blePeripheralDisconnectHandler(BLECentral& central) {
+  if (debug)Serial.println("BLEdisconnected");
+  powerUp();
+  bleSymbol = " ";
+}
+
+String answer = "";
+String tempCmd = "";
+int tempLen = 0, tempLen1;
+boolean syn;
+
+void characteristicWritten(BLECentral& central, BLECharacteristic& characteristic) {
+  char remoteCharArray[21];
+  tempLen1 = RXchar.valueLength();
+  tempLen = tempLen + tempLen1;
+  memset(remoteCharArray, 0, sizeof(remoteCharArray));
+  memcpy(remoteCharArray, RXchar.value(), tempLen1);
+  tempCmd = tempCmd + remoteCharArray;
+  if (tempCmd[tempLen - 2] == '\r' && tempCmd[tempLen - 1] == '\n') {
+    answer = tempCmd.substring(0, tempLen - 2);
+    tempCmd = "";
+    tempLen = 0;
+    if (debug)Serial.print("RxBle: ");
+    if (debug)Serial.println(answer);
+    filterCmd(answer);
+  }
+}
+
+void filterCmd(String Command) {
+  if (Command == "AT+BOND") {
+    sendBLEcmd("AT+BOND:OK");
+  } else if (Command == "AT+ACT") {
+    sendBLEcmd("AT+ACT:0");
+  } else if (Command.substring(0, 7) == "AT+RUN=") {
+    sendBLEcmd("AT+RUN:" + Command.substring(7));
+  } else if (Command.substring(0, 8) == "AT+USER=") {
+    sendBLEcmd("AT+USER:" + Command.substring(8));
+  }  else if (Command.substring(0, 7) == "AT+REC=") {
+    sendBLEcmd("AT+REC:" + Command.substring(7));
+  } else if (Command.substring(0, 8) == "AT+PUSH=") {
+    sendBLEcmd("AT+PUSH:OK");
+    handlePush(Command.substring(8));
+  } else if (Command.substring(0, 9) == "AT+MOTOR=") {
+    sendBLEcmd("AT+MOTOR:" + Command.substring(9));
+  } else if (Command.substring(0, 8) == "AT+DEST=") {
+    sendBLEcmd("AT+DEST:" + Command.substring(8));
+  } else if (Command.substring(0, 9) == "AT+ALARM=") {
+    sendBLEcmd("AT+ALARM:" + Command.substring(9));
+  } else if (Command.substring(0, 13) == "AT+HRMONITOR=") {
+    sendBLEcmd("AT+HRMONITOR:" + Command.substring(13));
+  } else if (Command.substring(0, 13) == "AT+FINDPHONE=") {
+    sendBLEcmd("AT+FINDPHONE:" + Command.substring(13));
+  } else if (Command.substring(0, 13) == "AT+ANTI_LOST=") {
+    sendBLEcmd("AT+ANTI_LOST:" + Command.substring(13));
+  } else if (Command.substring(0, 9) == "AT+UNITS=") {
+    sendBLEcmd("AT+UNITS:" + Command.substring(9));
+  } else if (Command.substring(0, 11) == "AT+HANDSUP=") {
+    sendBLEcmd("AT+HANDSUP:" + Command.substring(11));
+  } else if (Command.substring(0, 7) == "AT+SIT=") {
+    sendBLEcmd("AT+SIT:" + Command.substring(7));
+  } else if (Command.substring(0, 7) == "AT+LAN=") {
+    sendBLEcmd("AT+LAN:ERR");
+  } else if (Command.substring(0, 14) == "AT+TIMEFORMAT=") {
+    sendBLEcmd("AT+TIMEFORMAT:" + Command.substring(14));
+  } else if (Command == "AT+BATT") {
+    sendBLEcmd("AT+BATT:" + String(getBatteryLevel()));
+  } else if (Command == "BT+VER") {
+    sendBLEcmd("BT+VER:" + btversionNr);
+  } else if (Command == "AT+VER") {
+    sendBLEcmd("AT+VER:" + versionNr);
+  } else if (Command == "AT+SN") {
+    sendBLEcmd("AT+SN:" + serialNr);
+  } else if (Command.substring(0, 10) == "AT+DISMOD=") {
+    sendBLEcmd("AT+DISMOD:" + Command.substring(10));
+  } else if (Command.substring(0, 7) == "AT+LAN=") {
+    sendBLEcmd("AT+LAN:ERR");
+  } else if (Command.substring(0, 10) == "AT+MOTOR=1") {
+    sendBLEcmd("AT+MOTOR:1" + Command.substring(10));
+    digitalWrite(25, HIGH);
+    delay(300);
+    digitalWrite(25, LOW);
+  } else if (Command.substring(0, 12) == "AT+CONTRAST=") {
+    contrast = Command.substring(12).toInt();
+  } else if (Command.substring(0, 6) == "AT+DT=") {
+    SetDateTimeString(Command.substring(6));
+    sendBLEcmd("AT+DT:" + GetDateTimeString());
+  } else if (Command.substring(0, 5) == "AT+DT") {
+    sendBLEcmd("AT+DT:" + GetDateTimeString());
+  } else if (Command.substring(0, 12) == "AT+TIMEZONE=") {
+    timezone = Command.substring(12).toInt();
+    sendBLEcmd("AT+TIMEZONE:" + String(timezone));
+  } else if (Command.substring(0, 11) == "AT+TIMEZONE") {
+    sendBLEcmd("AT+TIMEZONE:" + String(timezone));
+  } else if (Command == "AT+STEPSTORE") {
+    sendBLEcmd("AT+STEPSTORE:OK");
+  } else if (Command == "AT+TOPACE=1") {
+    sendBLEcmd("AT+TOPACE:OK");
+    sendBLEcmd("NT+TOPACE:" + String(steps));
+  } else if (Command == "AT+TOPACE=0") {
+    sendBLEcmd("AT+TOPACE:" + String(steps));
+  } else if (Command == "AT+DATA=0") {
+    sendBLEcmd("AT+DATA:0,0,0,0");
+  } else if (Command.substring(0, 8) == "AT+PACE=") {
+    steps1 = Command.substring(8).toInt();
+    sendBLEcmd("AT+PACE:" + String(steps1));
+  } else if (Command == "AT+PACE") {
+    sendBLEcmd("AT+PACE:" + String(steps1));
+  } else if (Command == "AT+DATA=1") {
+    sendBLEcmd("AT+DATA:0,0,0,0");
+  } else if (Command.substring(0, 7) == "AT+SYN=") {
+    if (Command.substring(7) == "1") {
+      sendBLEcmd("AT+SYN:1");
+      syn = true;
+    } else {
+      sendBLEcmd("AT+SYN:0");
+      syn = false;
+    }
+  }
+}
+
+void sendBLEcmd(String Command) {
+  if (debug)Serial.print("TxBle: ");
+  if (debug)Serial.println(Command);
+  Command = Command + "\r\n";
+  while (Command.length() > 0) {
+    const char* TempSendCmd;
+    String TempCommand = Command.substring(0, 20);
+    TempSendCmd = &TempCommand[0];
+    TXchar.setValue(TempSendCmd);
+    TXchar1.setValue(TempSendCmd);
+    Command = Command.substring(20);
+  }
+}
+
+String GetDateTimeString() {
+  String datetime = String(year());
+  if (month() < 10) datetime += "0";
+  datetime += String(month());
+  if (day() < 10) datetime += "0";
+  datetime += String(day());
+  if (hour() < 10) datetime += "0";
+  datetime += String(hour());
+  if (minute() < 10) datetime += "0";
+  datetime += String(minute());
+  return datetime;
+}
+
+void SetDateTimeString(String datetime) {
+  int year = datetime.substring(0, 4).toInt();
+  int month = datetime.substring(4, 6).toInt();
+  int day = datetime.substring(6, 8).toInt();
+  int hr = datetime.substring(8, 10).toInt();
+  int min = datetime.substring(10, 12).toInt();
+  int sec = datetime.substring(12, 14).toInt();
+  setTime( hr, min, sec, day, month, year);
+}
+
+void handlePush(String pushMSG) {
+  int commaIndex = pushMSG.indexOf(',');
+  int secondCommaIndex = pushMSG.indexOf(',', commaIndex + 1);
+  int lastCommaIndex = pushMSG.indexOf(',', secondCommaIndex + 1);
+  String MsgText = pushMSG.substring(commaIndex + 1, secondCommaIndex);
+  int timeShown = pushMSG.substring(secondCommaIndex + 1, lastCommaIndex).toInt();
+  int SymbolNr = pushMSG.substring(lastCommaIndex + 1).toInt();
+  msgText = MsgText;
+  if (debug)Serial.println("MSGtext: " + msgText);
+  if (debug)Serial.println("symbol: " + String(SymbolNr));
+}
+
+int getBatteryLevel() {
+  return map((6.61207596594 * analogRead(3)), 3700, 4200, 0, 100);
+}
+
+void setup() {
+  pinMode(BUTTON_PIN, INPUT);
+  pinMode(3, INPUT);
+  if (digitalRead(BUTTON_PIN) == LOW) {
+    NRF_POWER->GPREGRET = 0x01;
+    sd_nvic_SystemReset();
+  }
+  pinMode(2, INPUT);
+  pinMode(25, OUTPUT);
+  digitalWrite(25, HIGH);
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
+  if (debug)Serial.begin(115200);
+  wdt_enable(5000);
+  blePeripheral.setLocalName("DS-D6");
+  blePeripheral.setAdvertisingInterval(555);
+  blePeripheral.setAppearance(0x0000);
+  blePeripheral.setConnectable(true);
+  blePeripheral.setDeviceName("ATCDSD6");
+  blePeripheral.setAdvertisedServiceUuid(batteryLevelService.uuid());
+  blePeripheral.addAttribute(batteryLevelService);
+  blePeripheral.addAttribute(TXchar);
+  blePeripheral.addAttribute(RXchar);
+  RXchar.setEventHandler(BLEWritten, characteristicWritten);
+  blePeripheral.setAdvertisedServiceUuid(batteryLevelService1.uuid());
+  blePeripheral.addAttribute(batteryLevelService1);
+  blePeripheral.addAttribute(TXchar1);
+  blePeripheral.addAttribute(RXchar1);
+  RXchar1.setEventHandler(BLEWritten, characteristicWritten);
+  blePeripheral.setEventHandler(BLEConnected, blePeripheralConnectHandler);
+  blePeripheral.setEventHandler(BLEDisconnected, blePeripheralDisconnectHandler);
+  blePeripheral.begin();
+  attachInterrupt(digitalPinToInterrupt(2), charge, RISING);
+  NRF_GPIO->PIN_CNF[2] &= ~((uint32_t)GPIO_PIN_CNF_SENSE_Msk);
+  NRF_GPIO->PIN_CNF[2] |= ((uint32_t)GPIO_PIN_CNF_SENSE_High << GPIO_PIN_CNF_SENSE_Pos);
+  attachInterrupt(digitalPinToInterrupt(BUTTON_PIN), buttonHandler, FALLING);
+  display.begin(SSD1306_SWITCHCAPVCC);
+  delay(100);
+  display.clearDisplay();
+  display.display();
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(10, 0);
+  display.println("D6 Emulator");
+  display.display();
+  digitalWrite(25, LOW);
+
+  sd_power_mode_set(NRF_POWER_MODE_LOWPWR);
+}
+
+void loop() {
+  blePeripheral.poll();
+  wdt_reset();
+  if (sleeping) {
+    sd_app_evt_wait();
+    sd_nvic_ClearPendingIRQ(SD_EVT_IRQn);
+  } else {
+    if (millis() - displayRefreshTime > refreshRate) {
+      displayRefreshTime = millis();
+      switch (menu) {
+        case 0:
+          displayMenu0();
+          break;
+        case 1:
+          displayMenu1();
+          break;
+        case 2:
+          displayMenu2();
+          break;
+        case 3:
+          displayMenu3();
+          break;
+        case 4:
+          displayMenu4();
+          break;
+      }
+    }
+    if (buttonPressed) {
+      buttonPressed = false;
+      switch (menu) {
+        case 0:
+          menu = 1;
+          break;
+        case 1:
+          menu = 2;
+          break;
+        case 2:
+          menu = 3;
+          break;
+        case 3:
+          menu = 4;
+          break;
+        case 4:
+          startbutton = millis();
+          while (!digitalRead(BUTTON_PIN)) {}
+          if (millis() - startbutton > 1000) {
+            delay(100);
+            int err_code = sd_power_gpregret_set(0x01);
+            sd_nvic_SystemReset();
+            while (1) {};
+            break;
+          } else {
+            menu = 0;
+          }
+      }
+    }
+    if ((digitalRead(2) == 0) && (millis() - sleepTime > sleepDelay )) powerDown();
+  }
+}
+
+void displayMenu0() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print(bleSymbol);
+  display.println(" Time and Batt:");
+  display.println(GetDateTimeString() + String(second()));
+  display.print(getBatteryLevel());
+  display.println("%");
+  display.println(contrast);
+  display.display();
+}
+
+void displayMenu1() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Menue1 Mac:");
+  char tmp[16];
+  sprintf(tmp, "%04X", NRF_FICR->DEVICEADDR[1] & 0xffff);
+  String MyID = tmp;
+  sprintf(tmp, "%08X", NRF_FICR->DEVICEADDR[0]);
+  MyID += tmp;
+  display.println(MyID);
+  display.display();
+}
+
+void displayMenu2() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Menue2 PushMSG:");
+  display.println(msgText);
+  display.display();
+}
+
+void displayMenu3() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.print("CMD Length: ");
+  display.println(answer.length());
+  display.println(answer);
+  display.display();
+}
+void displayMenu4() {
+  display.clearDisplay();
+  display.setCursor(0, 0);
+  display.println("Hello From Arduino");
+  display.println("  :)");
+  display.println("Hold for Bootloader");
+  display.display();
+}
