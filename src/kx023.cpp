@@ -107,6 +107,22 @@ void PulsePlug::initPulsePlugTap(){
 
 }
 
+
+void PulsePlug::initPulsePlugTilt(){
+	PulsePlug::setReg(regAddressCNTL1 , 0x41); //standby-performancemode-high resolution-2G-enable tilt
+	PulsePlug::setReg(regAddressCNTL2 , 0x3F); //detect tilt on 3axis positive and negative
+	PulsePlug::setReg(regAddressCNTL3 , 0x98); //data rate 12.5 Hz 
+	PulsePlug::setReg(0x22 , 0x01); //tilt_timer 80ms
+	PulsePlug::setReg(0x32 , 0x0C); //tilt angle 22degrees from horizontal
+	PulsePlug::setReg(0x33 , 0x2A); //tilt angle high limit (default)
+	PulsePlug::setReg(0x34 , 0x14); //hysteresis set to 15 degrees (default)
+	PulsePlug::setReg(regAddressINC1 , 0x30); //  interrupt control
+	PulsePlug::setReg(regAddressINC4 , 0x01); //  report on interrupt pin INT1
+       	
+	PulsePlug::setReg(regAddressCNTL1 , 0xC1); //operating mode
+
+}
+
 int16_t PulsePlug::getCoor (byte reg) {
 	// get a register
 	union data {

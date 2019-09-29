@@ -1,0 +1,61 @@
+#include <SoftWire.h>
+//uint8_t sdaPin = 13; //
+//uint8_t sclPin = 14; //
+SoftWire i2c(14, 13);
+
+union data {
+  int16_t data16;
+  byte  byteStr[2];//{*DATAL,*DATAH}
+};
+union data xData;
+union data yData;
+union data zData;
+
+const int sendorDeviceAddress = 0x1F;//I2C7bitAddressMode
+const int regAddressXOUTL = 0x06;
+const int regAddressYOUTL = 0x08;
+const int regAddressZOUTL = 0x0A;
+const int regAddressODCNTL = 0x1B;
+const int regAddressCNTL1 = 0x18;
+uint8_t blow=0, bhigh=0, pec=0;
+
+void setup() {
+  Serial.begin(38400);
+
+  Serial.print("setting up ");
+i2c.setDelay_us(5);
+  //KX023debice initialize
+  i2c.begin();
+  delay(300);
+  //stunbymode fullPower GLange2g
+  //i2c.beginTransmission(sendorDeviceAddress);
+  i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  i2c.write(0x0F); //who am I
+  i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+  i2c.readThenAck(blow);
+  i2c.readThenAck(bhigh);
+  i2c.readThenAck(pec);
+  i2c.stop();
+ // i2c.endTransmission();
+  //outPutDataLate 50Hz
+  //i2c.beginTransmission(sendorDeviceAddress);
+/*  i2c.write(0x1B);
+  i2c.write(0x02);
+//  i2c.endTransmission();
+  //sensor WakeUp
+  i2c.beginTransmission(sendorDeviceAddress);
+  i2c.write(0x18);
+  i2c.write(0xC0);
+  i2c.endTransmission();*/
+  Serial.print("result");
+  Serial.print(blow);
+  Serial.print(bhigh);
+  Serial.println("resultfinish");
+}  
+
+void loop() {
+
+  //readXout
+  delay(100);
+
+}

@@ -1,10 +1,10 @@
-./examples/Central/central_bleuart_multi/central_bleuart_multi.ino: * LED_BLUE  - Blinks constantly when scanning
-./examples/Hardware/hwpwm/hwpwm.ino:  HwPWM1.addPin( LED_BLUE );
-./examples/Hardware/hwpwm/hwpwm.ino:    HwPWM1.writePin(LED_BLUE, fadeValue, true);
-./examples/Hardware/hwpwm/hwpwm.ino:    HwPWM1.writePin(LED_BLUE, fadeValue, true);
-./examples/Hardware/rtos_scheduler/rtos_scheduler.ino: * - loop2() toggle LED_BLUE every half of second
-./examples/Hardware/rtos_scheduler/rtos_scheduler.ino:  // LED_RED & LED_BLUE pin already initialized as an output.
-./examples/Hardware/rtos_scheduler/rtos_scheduler.ino:  digitalToggle(LED_BLUE); // Toggle LED 
-./src/bluefruit.cpp:  digitalToggle(LED_BLUE);
-./src/bluefruit.cpp:    digitalWrite(LED_BLUE, on_off ? LED_STATE_ON : (1-LED_STATE_ON) );
-./keywords.txt:LED_BLUE	LITERAL1
+./examples/Peripheral/rssi_poll/rssi_poll.ino:  Bluefruit.autoConnLed(true);
+./examples/Peripheral/throughput/throughput.ino:  Bluefruit.autoConnLed(true);
+./examples/Peripheral/bleuart/bleuart.ino:  Bluefruit.autoConnLed(true);
+./examples/Peripheral/rssi_callback/rssi_callback.ino:  Bluefruit.autoConnLed(true);
+./examples/Peripheral/beacon/beacon.ino:  Bluefruit.autoConnLed(false);
+./examples/Peripheral/bleuart_multi/bleuart_multi.ino:  Bluefruit.autoConnLed(true);
+./examples/Peripheral/blemidi/blemidi.ino:  Bluefruit.autoConnLed(true);
+./src/bluefruit.cpp:void AdafruitBluefruit::autoConnLed(bool enabled)
+./src/bluefruit.h:    void     autoConnLed        (bool enabled);
+./keywords.txt:autoConnLed	KEYWORD2

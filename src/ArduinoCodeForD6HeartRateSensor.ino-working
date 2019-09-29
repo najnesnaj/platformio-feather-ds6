@@ -9,7 +9,7 @@
 //#include <nrf_soc.h>
 #include <WInterrupts.h>
 //#include <Adafruit_SSD1306.h>
-#include "Pah8001.h"
+//#include "Pah8001.h"
 #include "ds6_SSD1306.h"
 #include <TimeLib.h>
 #include <nrf.h>
@@ -50,9 +50,9 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, PIN_SPI_MOSI, PIN_SPI_SCK,
 
 
 //heartrate sensor pah8001 
-const int portForpah8001 = 1; // JJ
-PortI2C myBus(portForpah8001);
-PulsePlug pulse(myBus);
+//const int portForpah8001 = 1; // JJ
+//PortI2C myBus(portForpah8001);
+//PulsePlug pulse(myBus);
 
 
 
@@ -73,6 +73,8 @@ BLECharacteristic uur = BLECharacteristic(0x1234);
 
 BLEDis bledis;    // DIS (Device Information Service) helper class instance
 BLEBas blebas;    // BAS (Battery Service) helper class instance
+BLEUart bleuart;
+
 
 //BLE Client Current Time Service
 
@@ -158,6 +160,7 @@ void setup() {
 	bledis.setManufacturer("the commons");
 	bledis.setModel("De-esse six");
 	bledis.begin();
+	bleuart.begin();
 
 	// Start the BLE Battery Service and set it to 100%
 	Serial.println("Configuring the Battery Service");
@@ -202,7 +205,7 @@ void setup() {
 	//I2C.begin();
 	delay(100);
 	Serial.println("\nPah8001 Configure");
-	Pah8001_Configure();
+//	Pah8001_Configure();
 
 	for (int i = 0; i < 4; i++)reads[i] = 0;
 	sum = 0;
@@ -238,7 +241,7 @@ void startAdv(void)
 	//	Bluefruit.Advertising.addService(hrms);
 	Bluefruit.Advertising.addService(tijd);
 	// Include CTS client UUID
-
+Bluefruit.Advertising.addService(bleuart);
 	//Bluefruit.Advertising.addService(bleCTime);
 
 
@@ -322,10 +325,10 @@ void setupHRM(void)
 
 
 	//	digitalWrite(26, HIGH); //jj
-	Pah8001_Configure();
+	//Pah8001_Configure();
 
 	uint8_t buffer[13];
-	Pah8001_ReadRawData(buffer);
+	//Pah8001_ReadRawData(buffer);
 	if (buffer[0]) {
 		if (buffer[8] == 128) {
 			rawRate = map(buffer[6], 0, 255, 1023, 0);
@@ -465,6 +468,15 @@ void loop() {
 	if ((millis()-displayOnTime) > 5000) sleeping=true;
 	Serial.println("test");
 	Serial.print(millis()-displayOnTime);
+
+while ( bleuart.available() )
+  {
+      uint8_t ch;
+          ch = (uint8_t) bleuart.read();
+	      Serial.write(ch);
+	        }
+
+
 	if ( Bluefruit.connected() ) {
 		displayOnTime = millis();
 		sleeping=false;
@@ -733,7 +745,7 @@ static const struct {
 	{ 0x7Fu, 0x00u },
 	{ 0x5Du, 0x81u }
 };
-
+/*
 void Pah8001_Configure()
 {
 	uint8_t value;
@@ -774,7 +786,7 @@ void Pah8001_Configure()
 	Serial.println("data available: 0x00");
 	Serial.print(value);
 }
-
+*/
 
 void Pah8001_ReadRawData(uint8_t buffer[9])
 {

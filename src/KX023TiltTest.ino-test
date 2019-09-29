@@ -1,0 +1,71 @@
+#include "kx023.h"
+#include "ds6_SSD1306.h"
+
+const int portForKX023 = 1;
+PortI2C myBus(portForKX023);
+PulsePlug pulse(myBus);
+
+
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 32
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, PIN_SPI_MOSI, PIN_SPI_SCK, OLED_DC, OLED_RST, OLED_CS);
+
+
+
+void setup() {
+
+	Serial.begin(38400);
+	uint8_t value;
+	Serial.print("setting up ");
+
+	delay(300);
+	pulse.initPulsePlugTilt();
+
+	display.clearDisplay();
+	display.display();
+
+	display.setTextSize(1);
+	display.setTextColor(WHITE);
+	display.setCursor(10, 0);
+	display.println("Start");
+	display.display();
+}
+
+void loop() {
+	display.setCursor(0, 0);
+	display.println("NEUTRAL");
+	display.display();
+	byte tapinter;	
+	tapinter=pulse.getReg(0x15); //STAT register:w
+	if ((tapinter && 0b00001000) == 1) {
+		display.clearDisplay();
+		display.setCursor(0, 0);
+		display.println("ANGLE");
+		display.display();
+		Serial.println ("angle detected");
+	}
+	tapinter=pulse.getReg(0x13); //INS2 register bit 3 & 4 distinguis double/single tap
+	if ((tapinter && 0b00000001) == 1) Serial.println ("TPS bit detected");
+	tapinter=pulse.getReg(0x10); //TSCP current tilt position
+	Serial.println("current tilt position");
+	Serial.print(tapinter);
+	tapinter=pulse.getReg(0x11); //TSPP previous tilt position register 
+	Serial.println("previous tilt position");
+	Serial.print(tapinter);
+	//BUF_STATUS_1 0X3A
+	//BUF_STATUS_2 0X3B
+	//	Serial.print("interrupts:");
+	//	Serial.println(tapinter);
+	//	tapinter=pulse.getReg(0x3A); //STAT register:w
+	//	Serial.print("interrupts:");
+	//	Serial.println(tapinter);
+	//	tapinter=pulse.getReg(0x3B); //STAT register:w
+	//	Serial.print("interrupts:");
+	//	Serial.println(tapinter);
+	tapinter=pulse.getReg(0x17); //has to be read to release register
+
+
+	delay(100);
+}

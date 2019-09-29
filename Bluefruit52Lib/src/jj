@@ -1,0 +1,34 @@
+BLECentral.cpp:void BLECentral::begin(void)
+BLECentral.cpp:  Bluefruit.Discovery.begin();
+BLECentral.h:    void begin(void);
+BLECharacteristic.cpp:err_t BLECharacteristic::begin(void)
+BLECharacteristic.cpp:  (void) uuid.begin();
+BLECharacteristic.cpp:  (void) bleuuid.begin();
+BLECharacteristic.h:    virtual err_t begin(void);
+BLECharacteristic.h:    // Add Descriptor function must be called right after begin()
+BLEClientCharacteristic.cpp:void BLEClientCharacteristic::begin(BLEClientService* parent_svc)
+BLEClientCharacteristic.cpp:  (void) uuid.begin();
+BLEClientCharacteristic.cpp:  _adamsg.begin(true);
+BLEClientCharacteristic.h:    void     begin(BLEClientService* parent_svc = NULL);
+BLEClientService.cpp:bool BLEClientService::begin(void)
+BLEClientService.cpp:  (void) uuid.begin();
+BLEClientService.cpp:  if ( !Bluefruit.Discovery.begun() ) Bluefruit.Discovery.begin();
+BLEClientService.h:    virtual bool     begin(void);
+BLEDiscovery.cpp:void BLEDiscovery::begin(void)
+BLEDiscovery.cpp:    _adamsg.begin(false);
+BLEDiscovery.h:    void     begin(void);
+BLEGatt.cpp:  _adamsg.begin(true);
+BLEPeriph.cpp:bool BLEPeriph::begin(void)
+BLEPeriph.h:    bool begin(void);
+BLEService.cpp:err_t BLEService::begin(void)
+BLEService.cpp:  (void) uuid.begin();
+BLEService.h:    virtual err_t begin(void);
+BLEUuid.cpp:err_t BLEUuid::begin(void)
+BLEUuid.h:    err_t begin(void);
+bluefruit.cpp:   *  determined later in begin() depending on number of peripherals
+bluefruit.cpp:bool AdafruitBluefruit::begin(uint8_t prph_count, uint8_t central_count)
+bluefruit.cpp:  VERIFY( Periph.begin() );
+bluefruit.cpp:  if (_central_count)  Central.begin();
+bluefruit.cpp:  // Skip if Bluefruit.begin() is not called
+bluefruit.h:    /* SoftDevice Configure Functions, must call before begin().
+bluefruit.h:    bool begin(uint8_t prph_count = 1, uint8_t central_count = 0);

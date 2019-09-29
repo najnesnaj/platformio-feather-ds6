@@ -11,7 +11,8 @@ print ("Current minute = %s" %i.minute)
 
  
 temp_uuid = UUID(0x1234)
-p = Peripheral("C6:78:40:29:EC:31", "random")
+#p = Peripheral("C6:78:40:29:EC:31", "random")
+p = Peripheral("F6:2C:86:BD:4A:05", "random")
 
 
 

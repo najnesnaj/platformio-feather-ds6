@@ -1,0 +1,258 @@
+#include <SoftWire.h>
+
+SoftWire i2c(14,13);
+//SoftWire i2c(13,14);
+
+union data {
+  int16_t data16;
+  byte  byteStr[2];//{*DATAL,*DATAH}
+};
+union data xData;
+union data yData;
+union data zData;
+
+const int sendorDeviceAddress = 0x1F;//I2C7bitAddressMode
+const int regAddressXOUTL = 0x06;
+const int regAddressYOUTL = 0x08;
+const int regAddressZOUTL = 0x0A;
+const int regAddressODCNTL = 0x1B;
+const int regAddressCNTL1 = 0x18;
+
+
+void setup() {
+  Serial.begin(38400);
+
+  Serial.print("setting up ");
+i2c.setDelay_us(5);
+  //KX023debice initialize
+    i2c.begin();
+delay(300);
+  //KX023debice initialize
+//  Wire.begin();
+  //stunbymode fullPower GLange2g
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+
+//Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(0x18);
+  i2c.write(0x40);
+  i2c.stop();
+ // Wire.endTransmission();
+  //outPutDataLate 50Hz
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(0x1B);
+  i2c.write(0x02);
+  i2c.stop();
+  //Wire.endTransmission();
+  //sensor WakeUp
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(0x18);
+  i2c.write(0xC0);
+  i2c.stop();
+ // Wire.endTransmission();
+  Serial.print("setting up LPF");
+  
+  //setup LPF--------------------------------------------------
+  //ここを初期化処理に追加すると加速度センサ側でローパスフィルタがかかります
+  
+  //set device standbyMode
+  //readCNTL1reg
+  byte CNTL1 = 0;
+  //Wire.beginTransmission(sendorDeviceAddress);
+   i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  i2c.write(regAddressCNTL1);
+    i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ // Wire.endTransmission();
+  i2c.requestFrom(sendorDeviceAddress, 1);
+  CNTL1 = i2c.read();
+  //jj jj jj  i2c.readThenAck(CNTL1);
+  //setCNTL1reg
+  CNTL1 = CNTL1 & 0b01111111;
+ Serial.println("CNTL1"); 
+Serial.print(CNTL1);
+   i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressCNTL1);
+  i2c.write(CNTL1);
+  i2c.stop();
+  //Wire.endTransmission();
+
+  Serial.print("setting up LPF parameters");
+  //set LPF parameters
+  //readODCNTLreg
+  byte ODCNTL = 0;
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressODCNTL);
+  i2c.stop();
+  //Wire.endTransmission();
+  i2c.requestFrom(sendorDeviceAddress, 1);
+   i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+   i2c.readThenAck(ODCNTL);
+ // ODCNTL = Wire.read();
+  //setODCNTLreg
+  ODCNTL = ODCNTL | 0b01000000;//set filter corner frequency set to ODR/2
+  ODCNTL = ODCNTL & 0b11110000;//set OutputDataRate 12.5Hz
+ Serial.println("ODCNTL"); 
+Serial.print(ODCNTL);
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressODCNTL);
+  i2c.write(ODCNTL);
+  i2c.stop();
+ // Wire.endTransmission();
+ 
+ 
+ 
+ Serial.print("setting up device operating mode");
+  //set device operating mode
+  //readCNTL1reg
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  //Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressCNTL1);
+  //i2c.endTransmission();
+  i2c.stop();
+   i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ // Wire.requestFrom(sendorDeviceAddress, 1);
+  //CNTL1 = Wire.read();
+  i2c.readThenAck(CNTL1);
+  //setCNTL1reg
+  CNTL1 = CNTL1 | 0b10000000;
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressCNTL1);
+  i2c.write(CNTL1);
+  //Wire.endTransmission();
+  i2c.stop();
+  //--------------------------------------------------setup LPF
+
+}
+
+void loop() {
+  //readXout
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+ // Wire.beginTransmission(sendorDeviceAddress);
+  byte jlow,jhigh, pec;
+ i2c.write(regAddressXOUTL);
+ i2c.stop();
+ i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ i2c.readThenAck(jlow);
+ i2c.readThenAck(jhigh);
+ i2c.readThenAck(pec);
+ i2c.stop();
+ //i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  //i2c.write(regAddressJOUTL);
+  i2c.stop();
+ //i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ //byte htest;
+ //i2c.readThenAck(htest);
+  Serial.print(jlow, DEC);
+  Serial.print(jhigh, DEC);
+  Serial.println("X");
+
+
+
+
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+
+ i2c.write(regAddressYOUTL);
+ i2c.stop();
+ i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ i2c.readThenAck(jlow);
+ i2c.readThenAck(jhigh);
+ i2c.readThenAck(pec);
+ i2c.stop();
+ //i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  //i2c.write(regAddressJOUTL);
+  i2c.stop();
+ //i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ //byte htest;
+ //i2c.readThenAck(htest);
+  Serial.print(jlow, DEC);
+  Serial.print(jhigh, DEC);
+  Serial.println("Y:");
+
+
+ i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+
+ i2c.write(regAddressZOUTL);
+ i2c.stop();
+ i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ i2c.readThenAck(jlow);
+ i2c.readThenAck(jhigh);
+ i2c.readThenAck(pec);
+ i2c.stop();
+ //i2c.startWait(sendorDeviceAddress, SoftWire::writeMode);
+  //i2c.write(regAddressJOUTL);
+  i2c.stop();
+ //i2c.repeatedStart(sendorDeviceAddress, SoftWire::readMode);
+ //byte htest;
+ //i2c.readThenAck(htest);
+  Serial.print(jlow, DEC);
+  Serial.print(jhigh, DEC);
+  Serial.println("Z ");
+
+
+/*
+//i2c.requestFrom(sendorDeviceAddress, 2);
+//  xData.byteStr[0] = i2c.read();
+//  i2c.read(xData.byteStr[0]); 
+//  xData.byteStr[1] = i2c.read();
+ // i2c.read(xData.byteStr[1]);
+
+
+*/
+
+
+  //readYout
+  i2c.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressYOUTL);
+  i2c.endTransmission();
+  i2c.requestFrom(sendorDeviceAddress, 2);
+  yData.byteStr[0] = i2c.read();
+  yData.byteStr[1] = i2c.read();
+
+  //readZout
+  i2c.beginTransmission(sendorDeviceAddress);
+  i2c.write(regAddressZOUTL);
+  i2c.endTransmission();
+  i2c.requestFrom(sendorDeviceAddress, 2);
+  zData.byteStr[0] = i2c.read();
+  zData.byteStr[1] = i2c.read();
+
+
+//  //rawDataOutput
+  Serial.println("xdata:");
+  Serial.print(jlow, DEC);
+  Serial.print(jhigh, DEC);
+  Serial.println("xdata orig:");
+  Serial.print(xData.byteStr[0], DEC);
+  Serial.print(xData.byteStr[1], DEC);
+  Serial.print("xdata combined low&high byte:");
+  Serial.print(xData.data16, DEC);
+  Serial.println("");
+  Serial.print("ydata:");
+  Serial.print(yData.data16, DEC);
+  Serial.print(",");
+  Serial.print("zdata:");
+  Serial.println(zData.data16, DEC);
+
+//  Serial.print(xData.data16, DEC);
+ // Serial.print(",");
+  //Serial.print(yData.data16, DEC);
+ // Serial.print(",");
+ // Serial.println(zData.data16, DEC);
+
+//long xdata = xData.data16;
+//long ydata = yData.data16;
+//long zdata = zData.data16;
+//
+//double Norm = sqrt(double(pow(xdata,2) + pow(ydata,2) + pow(zdata,2)))-(32767/2);
+//Serial.print(Norm,DEC);
+//Serial.print(',');
+//static double vector = vector+Norm;
+//Serial.println(vector,DEC);
+
+  delay(100);
+}
